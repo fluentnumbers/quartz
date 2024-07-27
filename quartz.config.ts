@@ -8,15 +8,16 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "🪴 Quartz 4.0",
+    pageTitle: " Andrejs' 🪴",
     enableSPA: true,
     enablePopovers: true,
     analytics: {
-      provider: "plausible",
+      provider: "google",
+      tagId: "G-58YMG7L17G"
     },
     locale: "en-US",
-    baseUrl: "quartz.jzhao.xyz",
-    ignorePatterns: ["private", "templates", ".obsidian"],
+    baseUrl: "fluentnumbers.github.io",
+    ignorePatterns: ["private", "templates", ".obsidian", "drafts"],
     defaultDateType: "created",
     theme: {
       fontOrigin: "googleFonts",
