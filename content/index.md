@@ -1,7 +1,28 @@
 ---
 title: Hello👋, I am Andrejs
-layout: page
+aliases:
+  - personal-main
+  - welcome page
+publish: "true"
+"date:": "[[2024-07-27]]"
+link:
+tags:
+parent:
+source:
+related:
+  - "[[index]]"
+created_date: 2024/07/27
+updated_date: 2024/07/27
+cssclasses:
+  - personal-main
 ---
+
+%%
+date:: [[2024-07-27]]
+parent::
+source::
+tags::
+%%
 
 <style>
     .contacts-list {
