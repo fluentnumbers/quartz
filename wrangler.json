@@ -1,0 +1,8 @@
+{
+    "name": "quartz",
+    "main": "quartz/worker.ts",
+    "compatibility_date": "2025-04-30",
+    "assets": {
+        "directory": "./public"
+    }
+}
