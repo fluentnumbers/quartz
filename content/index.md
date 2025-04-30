@@ -1,8 +1,10 @@
 ---
+permalink: about
+classes: Test
 title: Hello👋, I am Andrejs
 aliases:
   - personal-main
-  - welcome page
+  - index
 publish: "true"
 "date:": "[[2024-07-27]]"
 link:
@@ -12,7 +14,7 @@ source:
 related:
   - "[[index]]"
 created_date: 2024/07/27
-updated_date: 2024/07/27
+updated_date: 2025/03/19
 cssclasses:
   - personal-main
 ---
@@ -51,18 +53,17 @@ tags::
 <!-- ### Hello👋, I am Andrejs -->
 <img style="float: right; margin: auto;" src="assets/images/profile.png" width="250px"/>
 <p>
-I am a passionate <strong>data scientist</strong> and <strong>ML engineer</strong> on a continuous journey of learning by doing & sharing.<br>
+I am a data scientist and ML engineer on a continuous journey of learning by doing & sharing.
 
-I strive to cultivate result-oriented team-environment by coupling my full-stack Machine Learning and communication skills. <br>
-Professionally I am open to challenges in data-centric teams where I make numbers speak fluent business language.<br>
+I live in the Netherlands and have almost 10 years of experience in data science, [[Machine Learning MoC|Machine Learning]] for various industrial applications including [[remote monitoring]], [[predictive maintenance]], [[digital twin]] and, since recently, also financial forecasting and [[asset management]].
 
-In offline there is a higher probability to meet me in a swimming pool, at a football field or behind a chess board (🫣, that's also mostly onlne...).<br>
-✨ If you have a great idea we can work on together (or any other great idea like *teach me play tennis properly*, for instance 😉), don't hesitate to reach out.✨
-
+It is nice, that you dropped by my "second brain", my [[PKM|digital garden]] and blog archive.
+It is a mix of (*atomic*) [[#Study Notes]], [[#Blogs]] and links I found useful.
+It is constantly in development except when it is not!
 
 </p>
 
-<!-- <h3>CONTACTS & SOCIALS</h3> -->
+### Contacts
 <ul class="contacts-list">
     <li>
         <a href="mailto:andrejs.fedjajevs@outlook.com">
@@ -114,3 +115,27 @@ Data Scientist at <strong><a href="https://www.philips.com/a-w/about.html">Phili
 
 <strong>2016 &mdash; 2022</strong><br>
 Senior R&D Engineer at <strong><a href="https://www.imec-int.com/en">Imec</a></strong>, Eindhoven, the Netherlands
+
+
+---
+
+### Blogs
+
+%%
+```dataview
+list from "000_notes/obsidian-published/blogs"
+```
+%%
+
+- [[before a meeting starts]]
+- [[Know your colleagues]]
+- [[to deceive a diplomat speak the truth]]
+- [[Don't Let the Green Grass Fool You]]
+- [[Artificial-Intelligence-as-a-Software-as-a-Medical-Device]]
+
+---
+
+### Study Notes
+
+> [!NOTE]- Selected LLM notes
+> ![[selected LLM notes#selected LLM notes]]
