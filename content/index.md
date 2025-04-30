@@ -69,26 +69,26 @@ In offline there is a higher probability to meet me in a swimming pool, at a foo
             <img src="assets/images/icons/email.png" alt="Email icon" style="width: 20px; height: 20px;">
         </a>
     </li>
-    <li>
+    <!-- <li>
         <a href="https://github.com/fluentnumbers" class="external" target="_blank">
             <img src="assets/images/icons/github.png" alt="GitHub icon" style="width: 20px; height: 20px;">
         </a>
-    </li>
+    </li> -->
     <li>
         <a class="external" href="https://www.linkedin.com/in/fedjajevs" target="_blank">
             <img src="assets/images/icons/linkedin.png" alt="LinkedIn icon" style="width: 20px; height: 20px;">
         </a>
     </li>
-    <li>
+    <!-- <li>
         <a class="external" href="https://t.me/fluentnumbers" target="_blank">
             <img src="assets/images/icons/telegram.png" alt="Telegram icon" style="width: 20px; height: 20px;">
         </a>
-    </li>
-    <li>
+    </li> -->
+    <!-- <li>
         <a class="external" href="https://x.com/fluentnumbers" target="_blank">
             <img src="assets/images/icons/twitter.png" alt="Twitter icon" style="width: 20px; height: 20px;">
         </a>
-    </li>
+    </li> -->
     <li>
         <a class="external" href="https://medium.com/@fluentnumbers" target="_blank">
             <img src="assets/images/icons/medium.png" alt="Medium icon" style="width: 20px; height: 20px;">
