@@ -16,8 +16,8 @@ const config: QuartzConfig = {
       tagId: "G-58YMG7L17G"
     },
     locale: "en-US",
-    baseUrl: "fluentnumbers.com",
-    ignorePatterns: ["private", "templates", ".obsidian", "drafts"],
+    baseUrl: "fluentnumbers.github.io",
+    ignorePatterns: ["private", "templates", ".obsidian", "drafts","!published**/!(*.md)", "!(*.md)"],
     defaultDateType: "created",
     theme: {
       fontOrigin: "googleFonts",
