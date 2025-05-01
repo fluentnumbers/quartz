@@ -9,3 +9,6 @@ tsconfig.tsbuildinfo
 private/
 .replit
 replit.nix
+content/sync_log.txt
+.specstory/.what-is-this.md
+.specstory/
