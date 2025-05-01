@@ -16,7 +16,7 @@ const config: QuartzConfig = {
       tagId: "G-58YMG7L17G"
     },
     locale: "en-US",
-    baseUrl: "fluentnumbers.github.io",
+    baseUrl: "fluentnumbers.com",
     ignorePatterns: ["private", "templates", ".obsidian", "drafts"],
     defaultDateType: "created",
     theme: {
@@ -73,7 +73,7 @@ const config: QuartzConfig = {
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
     ],
-    filters: [Plugin.RemoveDrafts()],
+    filters: [Plugin.ExplicitPublish(),],
     emitters: [
       Plugin.AliasRedirects(),
       Plugin.ComponentResources(),

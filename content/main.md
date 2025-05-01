@@ -14,7 +14,7 @@ source:
 related:
   - "[[index]]"
 created_date: 2024/07/27
-updated_date: 2025/03/19
+updated_date: 2025/05/01
 cssclasses:
   - personal-main
 ---
@@ -27,7 +27,7 @@ tags::
 %%
 
 <style>
-    .contacts-list {
+	.contacts-list {
         list-style-type: none; /* Remove bullet points */
         padding: 0; /* Remove default padding */
         display: flex; /* Use flexbox */
@@ -51,7 +51,7 @@ tags::
 
 </style>
 <!-- ### Hello👋, I am Andrejs -->
-<img style="float: right; margin: auto;" src="assets/images/profile.png" width="250px"/>
+<img style="float: right; margin: auto;" src="assets/profile.png" width="250px"/>
 <p>
 I am a data scientist and ML engineer on a continuous journey of learning by doing & sharing.
 
@@ -67,7 +67,7 @@ It is constantly in development except when it is not!
 <ul class="contacts-list">
     <li>
         <a href="mailto:andrejs.fedjajevs@outlook.com">
-            <img src="assets/images/icons/email.png" alt="Email icon" style="width: 20px; height: 20px;">
+            <img src="assets/icons/email.png" alt="Email icon" style="width: 20px; height: 20px;">
         </a>
     </li>
     <!-- <li>
@@ -77,27 +77,27 @@ It is constantly in development except when it is not!
     </li> -->
     <li>
         <a class="external" href="https://www.linkedin.com/in/fedjajevs" target="_blank">
-            <img src="assets/images/icons/linkedin.png" alt="LinkedIn icon" style="width: 20px; height: 20px;">
+            <img src="assets/icons/linkedin.png" alt="LinkedIn icon" style="width: 20px; height: 20px;">
         </a>
     </li>
     <!-- <li>
         <a class="external" href="https://t.me/fluentnumbers" target="_blank">
-            <img src="assets/images/icons/telegram.png" alt="Telegram icon" style="width: 20px; height: 20px;">
+            <img src="assets/icons/telegram.png" alt="Telegram icon" style="width: 20px; height: 20px;">
         </a>
     </li> -->
     <!-- <li>
         <a class="external" href="https://x.com/fluentnumbers" target="_blank">
-            <img src="assets/images/icons/twitter.png" alt="Twitter icon" style="width: 20px; height: 20px;">
+            <img src="assets/icons/twitter.png" alt="Twitter icon" style="width: 20px; height: 20px;">
         </a>
     </li> -->
     <li>
         <a class="external" href="https://medium.com/@fluentnumbers" target="_blank">
-            <img src="assets/images/icons/medium.png" alt="Medium icon" style="width: 20px; height: 20px;">
+            <img src="assets/icons/medium.png" alt="Medium icon" style="width: 20px; height: 20px;">
         </a>
     </li>
     <li>
         <a class="external" href="https://orcid.org/0000-0002-3047-9329" target="_blank">
-            <img src="assets/images/icons/orcid.png" alt="ORCID icon" style="width: 20px; height: 20px;">
+            <img src="assets/icons/orcid.png" alt="ORCID icon" style="width: 20px; height: 20px;">
         </a>
     </li>
 </ul>
