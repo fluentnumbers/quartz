@@ -7,10 +7,21 @@ if "%1"=="sync" (
     goto :eof
 )
 
-if "%1"=="clean" (
+if "%1"=="clean-log" (
     echo Cleaning up...
     if exist "content\sync_log.txt" del "content\sync_log.txt"
     echo Cleanup completed.
+    goto :eof
+)
+
+if "%1"=="clean-html" (
+    echo Cleaning public folder...
+    if exist "public" (
+        rmdir /s /q "public"
+        echo Public folder cleaned.
+    ) else (
+        echo Public folder does not exist.
+    )
     goto :eof
 )
 
@@ -34,18 +45,25 @@ if "%1"=="quartz-serve" (
     goto :eof
 )
 
-if "%1"=="sync-and-serve" (
+if "%1"=="sync-clean-and-serve" (
     echo Syncing content and starting development server...
     powershell -ExecutionPolicy Bypass -File sync_once.ps1
     echo Content synced. Starting Quartz server...
+    if exist "public" (
+        rmdir /s /q "public"
+        echo Public folder cleaned.
+    ) else (
+        echo Public folder does not exist.
+    )
     npx quartz build --serve
     goto :eof
 )
 
 echo Available commands:
 echo   sync            - Sync content once
-echo   clean           - Clean up log files
+echo   clean-log       - Clean up log files
+echo   clean-html      - Clean the public folder
 echo   quartz-sync     - Run Quartz sync
 echo   quartz-build    - Build Quartz site
 echo   quartz-serve    - Start Quartz development server
-echo   sync-and-serve  - Sync content and start development server
+echo   sync-clean-and-serve  - Sync content and start development server

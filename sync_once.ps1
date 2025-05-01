@@ -18,6 +18,17 @@ $ignoreFolders = @(
     ".obsidian-mobile"
 )
 
+# List of files to preserve in destination (relative to targetFolder)
+$preserveFiles = @(
+    "index.md",
+    "tags.md",
+    "search.md",
+    "assets/logo.png",
+    "assets/favicon.ico",
+    "assets/icons/*",
+    "assets/profile.png"
+)
+
 # Create target folder if it doesn't exist
 if (-not (Test-Path $targetFolder)) {
     New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
@@ -43,6 +54,29 @@ function Test-IsPublishedAsset {
         [string]$Path
     )
     return $Path -match "\\assets\\published\\"
+}
+
+# Function to check if file should be preserved
+function Test-ShouldPreserve {
+    param (
+        [string]$Path
+    )
+    $relativePath = $Path.Substring($targetFolder.Length)
+    foreach ($preserveFile in $preserveFiles) {
+        if ($preserveFile -like "*") {
+            # Handle wildcard patterns
+            $pattern = $preserveFile -replace "\*", ".*"
+            if ($relativePath -match "^$pattern$") {
+                return $true
+            }
+        } else {
+            # Handle exact matches
+            if ($preserveFiles -contains $relativePath) {
+                return $true
+            }
+        }
+    }
+    return $false
 }
 
 # Function to check if file contains any of the search strings
@@ -148,6 +182,12 @@ $destinationFiles = Get-DestinationFiles -Path $targetFolder
 foreach ($file in $destinationFiles) {
     $sourceFile = Join-Path $sourceFolder $file
     $targetFile = Join-Path $targetFolder $file
+
+    # Skip if file should be preserved
+    if (Test-ShouldPreserve -Path $targetFile) {
+        Write-Output "$(Get-Date): Preserving $targetFile (protected file)" | Out-File -FilePath $logFile -Append
+        continue
+    }
 
     if (Test-Path $sourceFile) {
         # File exists in source, check if it should be published

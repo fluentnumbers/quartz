@@ -3,7 +3,7 @@ $sourceFolder = "C:\Users\andre\OneDrive\Documents\obsidian-notes"  # Replace wi
 $targetFolder = "C:\Users\andre\Documents\repositories\quartz\content"  # Replace with your target folder path
 $publishStrings = @('publish: "true"', 'publish: true')  # Both formats to search for
 $unpublishStrings = @('publish: "false"', 'publish: false')  # Formats that indicate file should not be published
-$logFile = "C:\Users\andre\Documents\repositories\quartz\content\monitor_log.txt"     # Replace with your desired log file path
+$logFile = "C:\Users\andre\Documents\repositories\quartz\content\sync_log.txt"     # Replace with your desired log file path
 
 # List of folders to ignore (relative to sourceFolder)
 $ignoreFolders = @(
@@ -16,6 +16,17 @@ $ignoreFolders = @(
     ".obsidian.mobile",
     ".smart-connections",
     ".obsidian-mobile"
+)
+
+# List of files to preserve in destination (relative to targetFolder)
+$preserveFiles = @(
+    "index.md",
+    "tags.md",
+    "search.md",
+    "assets/logo.png",
+    "assets/favicon.ico",
+    "assets/icons/*",
+    "assets/profile.png"
 )
 
 # Create target folder if it doesn't exist
@@ -43,6 +54,29 @@ function Test-IsPublishedAsset {
         [string]$Path
     )
     return $Path -match "\\assets\\published\\"
+}
+
+# Function to check if file should be preserved
+function Test-ShouldPreserve {
+    param (
+        [string]$Path
+    )
+    $relativePath = $Path.Substring($targetFolder.Length)
+    foreach ($preserveFile in $preserveFiles) {
+        if ($preserveFile -like "*") {
+            # Handle wildcard patterns
+            $pattern = $preserveFile -replace "\*", ".*"
+            if ($relativePath -match "^$pattern$") {
+                return $true
+            }
+        } else {
+            # Handle exact matches
+            if ($preserveFiles -contains $relativePath) {
+                return $true
+            }
+        }
+    }
+    return $false
 }
 
 # Function to check if file contains any of the search strings
@@ -105,135 +139,132 @@ function Copy-FileWithRelativePath {
     Write-Output "$(Get-Date): Copied $SourceFile to $targetPath" | Out-File -FilePath $logFile -Append
 }
 
-# Function to handle file changes
-function Handle-FileChange {
+# Function to get all files that should be in the destination
+function Get-SourceFiles {
     param (
-        [string]$FilePath,
-        [string]$ChangeType
+        [string]$Path
     )
-
-    # Check if the path should be ignored
-    if (Test-ShouldIgnorePath -Path $FilePath) {
-        Write-Output "$(Get-Date): Ignoring $FilePath (excluded folder)" | Out-File -FilePath $logFile -Append
-        return
+    $files = @()
+    Get-ChildItem -Path $Path -Recurse -File | ForEach-Object {
+        if (-not (Test-ShouldIgnorePath -Path $_.FullName)) {
+            if (Test-ShouldPublish -FilePath $_.FullName) {
+                $relativePath = $_.FullName.Substring($sourceFolder.Length)
+                $files += $relativePath
+            }
+        }
     }
+    return $files
+}
 
-    # Only process files, not directories
-    if (Test-Path $FilePath -PathType Leaf) {
-        $relativePath = $FilePath.Substring($sourceFolder.Length)
-        $targetFile = Join-Path $targetFolder $relativePath
+# Function to get all files currently in the destination
+function Get-DestinationFiles {
+    param (
+        [string]$Path
+    )
+    $files = @()
+    if (Test-Path $Path) {
+        Get-ChildItem -Path $Path -Recurse -File | ForEach-Object {
+            $relativePath = $_.FullName.Substring($targetFolder.Length)
+            $files += $relativePath
+        }
+    }
+    return $files
+}
 
-        # Check if file should be published
-        $shouldPublish = Test-ShouldPublish -FilePath $FilePath
+# Function to perform sync
+function Sync-Files {
+    # Get lists of files
+    $sourceFiles = Get-SourceFiles -Path $sourceFolder
+    $destinationFiles = Get-DestinationFiles -Path $targetFolder
 
-        if ($shouldPublish) {
-            # File should be published, copy it
-            Copy-FileWithRelativePath -SourceFile $FilePath -SourceRoot $sourceFolder -TargetRoot $targetFolder
-        } else {
-            # File should not be published, delete it if it exists in target
-            if (Test-Path $targetFile) {
+    # Check all files in destination against source
+    foreach ($file in $destinationFiles) {
+        $sourceFile = Join-Path $sourceFolder $file
+        $targetFile = Join-Path $targetFolder $file
+
+        # Skip if file should be preserved
+        if (Test-ShouldPreserve -Path $targetFile) {
+            Write-Output "$(Get-Date): Preserving $targetFile (protected file)" | Out-File -FilePath $logFile -Append
+            continue
+        }
+
+        if (Test-Path $sourceFile) {
+            # File exists in source, check if it should be published
+            if (-not (Test-ShouldPublish -FilePath $sourceFile)) {
+                # File exists but should not be published
                 Remove-Item $targetFile -Force
                 Write-Output "$(Get-Date): Deleted $targetFile (marked as unpublished or missing publish flag)" | Out-File -FilePath $logFile -Append
-
-                # Clean up empty parent directories
-                $parentDir = Split-Path $targetFile -Parent
-                while ($parentDir -ne $targetFolder) {
-                    if ((Get-ChildItem -Path $parentDir -Recurse -Force | Measure-Object).Count -eq 0) {
-                        Remove-Item $parentDir -Force
-                        Write-Output "$(Get-Date): Removed empty directory $parentDir" | Out-File -FilePath $logFile -Append
-                        $parentDir = Split-Path $parentDir -Parent
-                    } else {
-                        break
-                    }
-                }
             }
+        } else {
+            # File doesn't exist in source, delete it
+            Remove-Item $targetFile -Force
+            Write-Output "$(Get-Date): Deleted $targetFile (no longer exists in source)" | Out-File -FilePath $logFile -Append
+        }
+    }
+
+    # Copy new and updated files
+    foreach ($file in $sourceFiles) {
+        $sourceFile = Join-Path $sourceFolder $file
+        $targetFile = Join-Path $targetFolder $file
+        Copy-FileWithRelativePath -SourceFile $sourceFile -SourceRoot $sourceFolder -TargetRoot $targetFolder
+    }
+
+    # Clean up empty directories in destination
+    Get-ChildItem -Path $targetFolder -Recurse -Directory | Sort-Object -Property FullName -Descending | ForEach-Object {
+        if ((Get-ChildItem -Path $_.FullName -Recurse -Force | Measure-Object).Count -eq 0) {
+            Remove-Item $_.FullName -Force
+            Write-Output "$(Get-Date): Removed empty directory $($_.FullName)" | Out-File -FilePath $logFile -Append
         }
     }
 }
 
-# Create FileSystemWatcher
+# Initial sync
+Write-Output "$(Get-Date): Starting initial sync..." | Out-File -FilePath $logFile -Append
+Sync-Files
+Write-Output "$(Get-Date): Initial sync completed." | Out-File -FilePath $logFile -Append
+
+# Set up file system watcher
 $watcher = New-Object System.IO.FileSystemWatcher
 $watcher.Path = $sourceFolder
 $watcher.IncludeSubdirectories = $true
 $watcher.EnableRaisingEvents = $true
 
-# Define the action to take when a file is created, changed, or deleted
+# Define the action to take when a file is changed
 $action = {
     $path = $Event.SourceEventArgs.FullPath
     $changeType = $Event.SourceEventArgs.ChangeType
+    $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 
-    switch ($changeType) {
-        'Created' {
-            Handle-FileChange -FilePath $path -ChangeType 'Created'
+    # Check if the path should be ignored
+    $shouldIgnore = $false
+    foreach ($ignoreFolder in $ignoreFolders) {
+        if ($path -match [regex]::Escape($ignoreFolder)) {
+            $shouldIgnore = $true
+            break
         }
-        'Changed' {
-            Handle-FileChange -FilePath $path -ChangeType 'Changed'
-        }
-        'Deleted' {
-            $relativePath = $path.Substring($sourceFolder.Length)
-            $targetFile = Join-Path $targetFolder $relativePath
-            if (Test-Path $targetFile) {
-                Remove-Item $targetFile -Force
-                Write-Output "$(Get-Date): Deleted $targetFile (source file deleted)" | Out-File -FilePath $logFile -Append
+    }
 
-                # Clean up empty parent directories
-                $parentDir = Split-Path $targetFile -Parent
-                while ($parentDir -ne $targetFolder) {
-                    if ((Get-ChildItem -Path $parentDir -Recurse -Force | Measure-Object).Count -eq 0) {
-                        Remove-Item $parentDir -Force
-                        Write-Output "$(Get-Date): Removed empty directory $parentDir" | Out-File -FilePath $logFile -Append
-                        $parentDir = Split-Path $parentDir -Parent
-                    } else {
-                        break
-                    }
-                }
-            }
-        }
-        'Renamed' {
-            $oldPath = $Event.SourceEventArgs.OldFullPath
-            $newPath = $Event.SourceEventArgs.FullPath
-
-            # Delete old file from destination if it exists
-            $oldRelativePath = $oldPath.Substring($sourceFolder.Length)
-            $oldTargetFile = Join-Path $targetFolder $oldRelativePath
-            if (Test-Path $oldTargetFile) {
-                Remove-Item $oldTargetFile -Force
-                Write-Output "$(Get-Date): Deleted $oldTargetFile (file renamed)" | Out-File -FilePath $logFile -Append
-            }
-
-            # Handle the new file
-            Handle-FileChange -FilePath $newPath -ChangeType 'Renamed'
-        }
+    if (-not $shouldIgnore) {
+        Write-Output "$timestamp : $changeType detected in $path" | Out-File -FilePath $logFile -Append
+        Sync-Files
     }
 }
 
 # Register the event handlers
-Register-ObjectEvent -InputObject $watcher -EventName "Created" -Action $action
-Register-ObjectEvent -InputObject $watcher -EventName "Changed" -Action $action
-Register-ObjectEvent -InputObject $watcher -EventName "Deleted" -Action $action
-Register-ObjectEvent -InputObject $watcher -EventName "Renamed" -Action $action
+Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
+Register-ObjectEvent -InputObject $watcher -EventName Changed -Action $action
+Register-ObjectEvent -InputObject $watcher -EventName Deleted -Action $action
+Register-ObjectEvent -InputObject $watcher -EventName Renamed -Action $action
 
-# Initial scan of existing files
-Write-Output "$(Get-Date): Starting initial scan of existing files..." | Out-File -FilePath $logFile -Append
-Get-ChildItem -Path $sourceFolder -Recurse -File | ForEach-Object {
-    if (-not (Test-ShouldIgnorePath -Path $_.FullName)) {
-        if (Test-ShouldPublish -FilePath $_.FullName) {
-            Copy-FileWithRelativePath -SourceFile $_.FullName -SourceRoot $sourceFolder -TargetRoot $targetFolder
-        }
-    }
-}
-
-Write-Output "$(Get-Date): Monitoring started. Press Ctrl+C to stop." | Out-File -FilePath $logFile -Append
+Write-Output "$(Get-Date): File monitoring started. Press Ctrl+C to stop." | Out-File -FilePath $logFile -Append
 
 # Keep the script running
 try {
-    while ($true) {
-        Start-Sleep -Seconds 1
-    }
+    while ($true) { Start-Sleep -Seconds 1 }
 }
 finally {
     # Cleanup
     $watcher.EnableRaisingEvents = $false
     $watcher.Dispose()
-    Write-Output "$(Get-Date): Monitoring stopped." | Out-File -FilePath $logFile -Append
+    Write-Output "$(Get-Date): File monitoring stopped." | Out-File -FilePath $logFile -Append
 }
